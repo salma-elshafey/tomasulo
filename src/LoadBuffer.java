@@ -1,5 +1,5 @@
 public class LoadBuffer {
-    private String tag; // S1, S2, S3
+    private String tag; // L1, L2, L3
     private boolean busy;
     private int address;
 
