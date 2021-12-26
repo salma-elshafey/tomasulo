@@ -2,9 +2,9 @@ public class OperationBuffer {
     private int remainingTime;
     private String tag;
     private boolean busy;
-    private String op; // "ADD", "SUB", "MUL" or "DIV" --> should we make an enum?
+    private String op; // "ADD.D", "SUB.D", "MUL.D" or "DIV.D" --> should we make an enum?
     private int Vj, Vk;
-    private String Qi, Qk;
+    private String Qj, Qk;
     private int address; // to hold info for the memory address calculation for a load or a store
 
 
@@ -15,7 +15,7 @@ public class OperationBuffer {
         op = "";
         Vj = 0;
         Vk = 0;
-        Qi = "";
+        Qj = "";
         Qk = "";
         address = 0;
     }
@@ -28,7 +28,7 @@ public class OperationBuffer {
         this.op = op;
         this.Vj = Vj;
         this.Vk = Vk;
-        this.Qi = Qi;
+        this.Qj = Qi;
         this.Qk = Qk;
         this.address = address;
     }
@@ -82,12 +82,12 @@ public class OperationBuffer {
         Vk = vk;
     }
 
-    public String getQi() {
-        return Qi;
+    public String getQj() {
+        return Qj;
     }
 
-    public void setQi(String qi) {
-        Qi = qi;
+    public void setQj(String qi) {
+        Qj = qi;
     }
 
     public String getQk() {

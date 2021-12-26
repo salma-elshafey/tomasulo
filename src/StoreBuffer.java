@@ -2,10 +2,10 @@ public class StoreBuffer {
     private String tag; // S1, S2, S3
     private boolean busy;
     private int address;
-    private String V;
+    private int V;
     private String Q;
 
-    public StoreBuffer (String tag, boolean busy, int address, String V, String Q){
+    public StoreBuffer (String tag, boolean busy, int address, int V, String Q){
         this.tag = tag;
         this.busy = busy;
         this.address = address;
@@ -37,11 +37,11 @@ public class StoreBuffer {
         this.address = address;
     }
 
-    public String getV() {
+    public int getV() {
         return V;
     }
 
-    public void setV(String v) {
+    public void setV(int v) {
         V = v;
     }
 
