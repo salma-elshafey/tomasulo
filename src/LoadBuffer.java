@@ -1,9 +1,13 @@
 public class LoadBuffer {
+    private int remainingTime;
     private String tag; // L1, L2, L3
     private boolean busy;
     private int address;
+    private int instructionIndex;
+    private double result;
 
     public LoadBuffer (String tag, boolean busy, int address){
+        remainingTime = -1;
         this.tag = tag;
         this.busy = busy;
         this.address = address;
@@ -32,4 +36,31 @@ public class LoadBuffer {
     public void setAddress(int address) {
         this.address = address;
     }
+
+    public int getRemainingTime() {
+        return remainingTime;
+    }
+
+    public void setRemainingTime(int remainingTime) {
+        this.remainingTime = remainingTime;
+    }
+
+
+    public int getInstructionIndex() {
+        return instructionIndex;
+    }
+
+    public void setInstructionIndex(int instructionIndex) {
+        this.instructionIndex = instructionIndex;
+    }
+
+
+    public double getResult() {
+        return result;
+    }
+
+    public void setResult(double result) {
+        this.result = result;
+    }
+
 }

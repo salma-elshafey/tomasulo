@@ -3,13 +3,15 @@ public class OperationBuffer {
     private String tag;
     private boolean busy;
     private String op; // "ADD.D", "SUB.D", "MUL.D" or "DIV.D" --> should we make an enum?
-    private int Vj, Vk;
+    private double Vj, Vk;
     private String Qj, Qk;
     private int address; // to hold info for the memory address calculation for a load or a store
+    private int instructionIndex;
+    private double result;
 
 
     public OperationBuffer(String tag) { //default values
-        remainingTime = 0;
+        remainingTime = -1;
         this.tag = tag;
         busy = false;
         op = "";
@@ -18,19 +20,6 @@ public class OperationBuffer {
         Qj = "";
         Qk = "";
         address = 0;
-    }
-
-    public OperationBuffer(int remainingTime, String tag, boolean busy, String op, int Vj,
-                           int Vk, String Qi, String Qk, int address) {
-        this.remainingTime = remainingTime;
-        this.tag = tag;
-        this.busy = busy;
-        this.op = op;
-        this.Vj = Vj;
-        this.Vk = Vk;
-        this.Qj = Qi;
-        this.Qk = Qk;
-        this.address = address;
     }
 
 
@@ -66,19 +55,19 @@ public class OperationBuffer {
         this.op = op;
     }
 
-    public int getVj() {
+    public double getVj() {
         return Vj;
     }
 
-    public void setVj(int vj) {
+    public void setVj(double vj) {
         Vj = vj;
     }
 
-    public int getVk() {
+    public double getVk() {
         return Vk;
     }
 
-    public void setVk(int vk) {
+    public void setVk(double vk) {
         Vk = vk;
     }
 
@@ -104,5 +93,22 @@ public class OperationBuffer {
 
     public void setAddress(int address) {
         this.address = address;
+    }
+
+    public int getInstructionIndex() {
+        return instructionIndex;
+    }
+
+    public void setInstructionIndex(int instructionIndex) {
+        this.instructionIndex = instructionIndex;
+    }
+
+
+    public double getResult() {
+        return result;
+    }
+
+    public void setResult(double result) {
+        this.result = result;
     }
 }
