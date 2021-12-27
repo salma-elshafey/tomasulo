@@ -1,6 +1,6 @@
 public class Bus { // <tag, value> -->  <L1, 5.8>
     String tag;
-    int value;
+    double value;
 
     public String getTag() {
         return tag;
@@ -10,11 +10,11 @@ public class Bus { // <tag, value> -->  <L1, 5.8>
         this.tag = tag;
     }
 
-    public int getValue() {
+    public double getValue() {
         return value;
     }
 
-    public void setValue(int value) {
+    public void setValue(double value) {
         this.value = value;
     }
 }

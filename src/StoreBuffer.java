@@ -9,7 +9,7 @@ public class StoreBuffer {
     private double result;
 
     public StoreBuffer (String tag, boolean busy, int address, int V, String Q){
-        remainingTime = -1;
+        remainingTime = -2;
         this.tag = tag;
         this.busy = busy;
         this.address = address;

@@ -11,7 +11,7 @@ public class OperationBuffer {
 
 
     public OperationBuffer(String tag) { //default values
-        remainingTime = -1;
+        remainingTime = -2;
         this.tag = tag;
         busy = false;
         op = "";

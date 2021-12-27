@@ -7,7 +7,7 @@ public class LoadBuffer {
     private double result;
 
     public LoadBuffer (String tag, boolean busy, int address){
-        remainingTime = -1;
+        remainingTime = -2;
         this.tag = tag;
         this.busy = busy;
         this.address = address;

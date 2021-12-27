@@ -10,8 +10,10 @@ public class Architecture {
     StoreBuffer[] storeBuffers = new StoreBuffer[3];
     HashMap<String, Register> registerFile = new HashMap<String, Register>(); // {("F0" -> 12), ("F1", 2)}
     //Register[] registerFile = new Register[12];
-    Bus commonDataBus = new Bus();
+   // Bus commonDataBus = new Bus();
     HashMap<Integer, Double> memory = new HashMap<Integer, Double>(); // <address, value>
+  //  Queue<String> waitingToWriteBack = new LinkedList<String>();
+    HashMap<String,Double> bus = new HashMap <String,Double>();
     int clockCycle = 1;
     int instructionToBeIssued = 0;
     int ldLatency;
@@ -152,6 +154,7 @@ public class Architecture {
     public void start () {
         issue();
         execute();
+        writeResult();
         clockCycle++;
     }
     public void issue() {
@@ -344,6 +347,61 @@ public class Architecture {
                 } else {
                     storeBuffers[i].setRemainingTime(storeBuffers[i].getRemainingTime() - 1);
                 }
+            }
+
+        }
+
+
+    }
+
+    public void writeResultHelper(){
+      //String tag= bus
+    }
+    public void writeResult(){
+        for(int i = 0; i < 2; i++) {
+            if (mulDivBuffers[i].isBusy()) {
+                if (mulDivBuffers[i].getQj().equals("") && mulDivBuffers[i].getQk().equals("")) {
+                    //to check that all values are ready
+                    if ( mulDivBuffers[i].getRemainingTime() == -1) {
+                        instructionQueue.get(mulDivBuffers[i].getInstructionIndex()).writeBack = clockCycle;
+                        mulDivBuffers[i].setBusy(false);
+                        //waitingToWriteBack.add(mulDivBuffers[i].getTag());
+                        bus.put(mulDivBuffers[i].getTag(),mulDivBuffers[i].getResult());
+
+
+                    }
+
+
+                }
+            }
+        }
+
+        //loop on add/sub
+        for(int i=0; i<3; i++){
+            if (addSubBuffers[i].isBusy()) {
+                if (addSubBuffers[i].getQj().equals("") && addSubBuffers[i].getQk().equals("")) {
+                    //to check that all values are ready
+                    if ( addSubBuffers[i].getRemainingTime() == -1) {
+                        instructionQueue.get(addSubBuffers[i].getInstructionIndex()).writeBack = clockCycle;
+                        addSubBuffers[i].setBusy(false);
+                        bus.put(addSubBuffers[i].getTag(),addSubBuffers[i].getResult());
+                    }
+
+                }
+            }
+        }
+
+        //load
+        for(int i=0 ;i<3; i++){
+            if (loadBuffers[i].isBusy()) {
+                //to check that all values are ready
+                if (loadBuffers[i].getRemainingTime() == -1) {
+                    instructionQueue.get(loadBuffers[i].getInstructionIndex()).writeBack = clockCycle;
+                    //access the memory and to load value from it
+                    loadBuffers[i].setBusy(false);
+                    bus.put(loadBuffers[i].getTag(),loadBuffers[i].getResult());
+                }
+
             }
 
         }
