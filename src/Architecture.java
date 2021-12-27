@@ -148,7 +148,7 @@ public class Architecture {
             myReader.close();
         } catch (FileNotFoundException e) {
             System.out.println("An error occurred.");
-            e.printStackTrace();
+              e.printStackTrace();
         }
     }
     public void start () {
@@ -356,6 +356,59 @@ public class Architecture {
 
     public void writeResultHelper(){
       //String tag= bus
+        while(!bus.isEmpty()){
+            for (Map.Entry<String,Double> entry : bus.entrySet()){
+              //  System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
+                String key =entry.getKey();
+                Double value=entry.getValue();
+                //loop over reg file, add/sub buffer, mul/div buffer, store buffer
+                //mul/div buffer
+                for(int i = 0; i < 2; i++) {
+                    if (mulDivBuffers[i].isBusy()) {
+                        if (mulDivBuffers[i].getQj().equals(key)) {
+                            mulDivBuffers[i].setVj(value);
+                            mulDivBuffers[i].setQj("");
+                        }
+                        if(mulDivBuffers[i].getQk().equals(key)){
+                            mulDivBuffers[i].setVk(value);
+                            mulDivBuffers[i].setQj("");
+                        }
+                    }
+                }
+                //add/sub buffer
+                for(int i = 0; i < 3; i++) {
+                    if (addSubBuffers[i].isBusy()) {
+                        if (addSubBuffers[i].getQj().equals(key)) {
+                            addSubBuffers[i].setVj(value);
+                            addSubBuffers[i].setQj("");
+                        }
+                        if(addSubBuffers[i].getQk().equals(key)){
+                            addSubBuffers[i].setVk(value);
+                            addSubBuffers[i].setQj("");
+                        }
+                    }
+                }
+                //store buffer
+                for(int i = 0; i < 3; i++){
+                    if (storeBuffers[i].isBusy()) {
+                        if (storeBuffers[i].getQ().equals(key)) {
+                            storeBuffers[i].setV(value);
+                            storeBuffers[i].setQ("");
+                        }
+
+                    }
+                }
+                //reg file
+                for(Register qValue : registerFile.values()) {
+                    if(qValue.getQi().equals(value)){
+                        qValue.setQi("");
+                        qValue.setValue(value);
+                    }
+                }
+
+            }
+
+        }
     }
     public void writeResult(){
         for(int i = 0; i < 2; i++) {
@@ -367,11 +420,7 @@ public class Architecture {
                         mulDivBuffers[i].setBusy(false);
                         //waitingToWriteBack.add(mulDivBuffers[i].getTag());
                         bus.put(mulDivBuffers[i].getTag(),mulDivBuffers[i].getResult());
-
-
                     }
-
-
                 }
             }
         }
@@ -403,10 +452,23 @@ public class Architecture {
                 }
 
             }
+        }
+        //store
+        for(int i=0 ;i<3; i++){
+            if (storeBuffers[i].isBusy()) {
+                //to check that all values are ready
+                if (storeBuffers[i].getRemainingTime() == -1 && storeBuffers[i].getQ().equals("") ) {
+                    instructionQueue.get(storeBuffers[i].getInstructionIndex()).writeBack = clockCycle;
+                    //access the memory and to load value from it
+                    storeBuffers[i].setBusy(false);
+                    bus.put(storeBuffers[i].getTag(),storeBuffers[i].getResult());
+                }
 
+            }
         }
 
 
+        writeResultHelper();
     }
 
     public static void main (String[] args){

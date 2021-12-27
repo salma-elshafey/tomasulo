@@ -1,14 +1,14 @@
 public class Register {
     private String name; // F0, F1, etc.
     private String Qi; // either "" or tag
-    private int value;
+    private Double value;
 
     public Register(String name) {
         this.name = name;
         Qi = "";
-        value = 0;
+        value = 0.0;
     }
-    public Register (String name, String Qi, int value){
+    public Register (String name, String Qi, Double value){
         this.name = name;
         this.Qi = Qi;
         this.value = value;
@@ -30,11 +30,11 @@ public class Register {
         Qi = qi;
     }
 
-    public int getValue() {
+    public Double getValue() {
         return value;
     }
 
-    public void setValue(int value) {
+    public void setValue(Double value) {
         this.value = value;
     }
 }
