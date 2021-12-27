@@ -273,47 +273,46 @@ public class Architecture {
                     if (mulDivBuffers[i].getOp().equals("MUL.D") && mulDivBuffers[i].getRemainingTime() == mulLatency) {
                         instructionQueue.get(mulDivBuffers[i].getInstructionIndex()).startExecution = clockCycle;
                         mulDivBuffers[i].setResult(mulDivBuffers[i].getVj() * mulDivBuffers[i].getVk());
-                    } else {
+                    }
+                    else {
                         if (mulDivBuffers[i].getRemainingTime() == divLatency) {
                             instructionQueue.get(mulDivBuffers[i].getInstructionIndex()).startExecution = clockCycle;
                             mulDivBuffers[i].setResult(mulDivBuffers[i].getVj() / mulDivBuffers[i].getVk());
                             }
-                        }
-                    if (mulDivBuffers[i].getRemainingTime() == 0) {
-                        instructionQueue.get(mulDivBuffers[i].getInstructionIndex()).finishExecution = clockCycle;
-                    } else {
-                        mulDivBuffers[i].setRemainingTime(mulDivBuffers[i].getRemainingTime() - 1);
                     }
-
+                    if (mulDivBuffers[i].getRemainingTime() == 0)
+                        instructionQueue.get(mulDivBuffers[i].getInstructionIndex()).finishExecution = clockCycle;
+                    else
+                        mulDivBuffers[i].setRemainingTime(mulDivBuffers[i].getRemainingTime() - 1);
                 }
             }
         }
 
         //loop on add/sub
-        for(int i=0; i<3; i++){
+        for(int i = 0; i < 3; i++){
             if (addSubBuffers[i].isBusy()) {
                 if (addSubBuffers[i].getQj().equals("") && addSubBuffers[i].getQk().equals("")) {
                     //to check that all values are ready
                     if (addSubBuffers[i].getOp().equals("ADD.D") && addSubBuffers[i].getRemainingTime() == addLatency) {
                         instructionQueue.get(addSubBuffers[i].getInstructionIndex()).startExecution = clockCycle;
                         addSubBuffers[i].setResult(addSubBuffers[i].getVj() + addSubBuffers[i].getVk());
-                    } else {
+                    }
+                    else {
                         if (addSubBuffers[i].getRemainingTime() == subLatency) {
                             instructionQueue.get(addSubBuffers[i].getInstructionIndex()).startExecution = clockCycle;
                             addSubBuffers[i].setResult(addSubBuffers[i].getVj() - addSubBuffers[i].getVk());
                         }
                     }
-                    if (addSubBuffers[i].getRemainingTime() == 0) {
+                    if (addSubBuffers[i].getRemainingTime() == 0)
                         instructionQueue.get(addSubBuffers[i].getInstructionIndex()).finishExecution = clockCycle;
-                    } else {
+                    else
                         addSubBuffers[i].setRemainingTime(addSubBuffers[i].getRemainingTime() - 1);
-                    }
                 }
             }
         }
 
         //load
-        for(int i=0 ;i<3; i++){
+        for(int i = 0 ; i < 3; i++){
             if (loadBuffers[i].isBusy()) {
                     //to check that all values are ready
                     if (loadBuffers[i].getRemainingTime() == ldLatency) {
@@ -327,11 +326,9 @@ public class Architecture {
                         loadBuffers[i].setRemainingTime(loadBuffers[i].getRemainingTime() - 1);
                     }
             }
-
         }
-
         //store
-        for(int i=0 ;i<3; i++){
+        for(int i = 0; i < 3; i++){
             if (storeBuffers[i].isBusy()) {
                 //to check that all values are ready
                 if ( storeBuffers[i].getQ().equals("") && storeBuffers[i].getRemainingTime() == sdLatency) {
@@ -339,18 +336,13 @@ public class Architecture {
                     //access the memory and to store value in it
                     memory.put(storeBuffers[i].getAddress(),storeBuffers[i].getV());
                 }
-                if (storeBuffers[i].getRemainingTime() == 0) {
+                if (storeBuffers[i].getRemainingTime() == 0)
                     instructionQueue.get(storeBuffers[i].getInstructionIndex()).finishExecution = clockCycle;
-                } else {
+                else
                     storeBuffers[i].setRemainingTime(storeBuffers[i].getRemainingTime() - 1);
-                }
             }
-
         }
-
-
     }
-
     public static void main (String[] args){
         Architecture a = new Architecture();
         a.setup();
