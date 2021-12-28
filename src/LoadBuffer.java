@@ -5,12 +5,16 @@ public class LoadBuffer {
     private int address;
     private int instructionIndex;
     private double result;
+    int issued;
 
+    public  String toString(){
+        return "Tag: "+tag+ "  "+"   Address:"+getAddress()+"   Busy:"+busy+"\n";
+    }
     public LoadBuffer (String tag, boolean busy, int address){
         remainingTime = -2;
         this.tag = tag;
         this.busy = busy;
-        this.address = address;
+        this.address = -1;
     }
 
     public String getTag() {

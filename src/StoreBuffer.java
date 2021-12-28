@@ -7,13 +7,17 @@ public class StoreBuffer {
     private String Q;
     private int instructionIndex;
     private double result;
+    int issued;
 
+    public  String toString(){
+        return "Tag: "+tag+ "  "+"   Q:"+getQ()+"  V:"+getV()+"   Address:"+getAddress()+"   Busy:"+busy+"\n";
+    }
     public StoreBuffer (String tag, boolean busy, int address, int V, String Q){
         remainingTime = -2;
         this.tag = tag;
         this.busy = busy;
-        this.address = address;
-        this.V = V;
+        this.address = -1;
+        this.V = -1;
         this.Q = Q;
     }
 

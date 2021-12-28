@@ -1,3 +1,4 @@
+import java.lang.reflect.Array;
 import java.util.*;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -13,7 +14,12 @@ public class Architecture {
    // Bus commonDataBus = new Bus();
     HashMap<Integer, Double> memory = new HashMap<Integer, Double>(); // <address, value>
   //  Queue<String> waitingToWriteBack = new LinkedList<String>();
-    HashMap<String,Double> bus = new HashMap <String,Double>();
+ // Map<Integer, String> bus = new LinkedHashMap<>(16, .75f, true);
+  LinkedList<HashMap<String,Double>> bus=new LinkedList<HashMap<String,Double>>();
+//    LinkedHashMap<Integer, String> map
+//            = new LinkedHashMap<>(16, .75f, true);
+    //Map<String, String> map = new LinkedHashMap<String, String>();
+    int numberOfInstructure=0;
     int clockCycle = 1;
     int instructionToBeIssued = 0;
     int ldLatency;
@@ -124,6 +130,7 @@ public class Architecture {
             File myObj = new File("src/program.txt");
             Scanner myReader = new Scanner(myObj);
             while (myReader.hasNextLine()) {
+                numberOfInstructure++;
                 String data = myReader.nextLine();
                 String[] instruction = data.split(" ");
                 if (instruction[0].equals("L.D") || instruction[0].equals("S.D"))
@@ -152,10 +159,28 @@ public class Architecture {
         }
     }
     public void start () {
-        issue();
-        execute();
-        writeResult();
-        clockCycle++;
+ while(instructionToBeIssued<numberOfInstructure) {
+     if(clockCycle!=1){
+
+         issue();
+         execute();
+         writeResult();
+     }
+     else{
+         issue();
+     }
+
+//     writeResult();
+     System.out.println("Clock Cycle:"+clockCycle);
+     System.out.println("Instructure queue \n"+instructionQueue.toString());
+     System.out.println("Add/Sub buffer \n"+ Arrays.deepToString(addSubBuffers));
+     System.out.println("Mul/Div buffer\n"+Arrays.deepToString(mulDivBuffers));
+     System.out.println("Load Buffer\n"+Arrays.deepToString(loadBuffers));
+     System.out.println("Store Buffer\n"+Arrays.deepToString(storeBuffers));
+     System.out.println("Register File\n"+registerFile.toString());
+     System.out.println();
+     clockCycle++;
+ }
     }
     public void issue() {
         if (instructionQueue.get(instructionToBeIssued).mem == null) { //it's an ALU instruction
@@ -181,6 +206,7 @@ public class Architecture {
                         registerFile.get(destination).setQi(mulDivBuffers[i].getTag());
                         instructionQueue.get(instructionToBeIssued).setIssue(clockCycle);
                         mulDivBuffers[i].setInstructionIndex(instructionToBeIssued); //important
+                        mulDivBuffers[i].issued=clockCycle;
                         instructionToBeIssued++;
                         if(operation.equals("MUL.D")){
                             mulDivBuffers[i].setRemainingTime(mulLatency);
@@ -212,6 +238,7 @@ public class Architecture {
                         registerFile.get(destination).setQi(mulDivBuffers[i].getTag());
                         instructionQueue.get(instructionToBeIssued).setIssue(clockCycle);
                         addSubBuffers[i].setInstructionIndex(instructionToBeIssued);
+                        addSubBuffers[i].issued=clockCycle;
                         instructionToBeIssued++;
                         if(operation.equals("ADD.D")){
                             addSubBuffers[i].setRemainingTime(addLatency);
@@ -237,6 +264,7 @@ public class Architecture {
                         registerFile.get(register).setQi(loadBuffers[i].getTag());
                         instructionQueue.get(instructionToBeIssued).setIssue(clockCycle);
                         loadBuffers[i].setInstructionIndex(instructionToBeIssued);
+                        loadBuffers[i].issued=clockCycle;
                         instructionToBeIssued++;
                         loadBuffers[i].setRemainingTime(ldLatency);
                         break;
@@ -259,6 +287,7 @@ public class Architecture {
                         }
                         instructionQueue.get(instructionToBeIssued).setIssue(clockCycle);
                         storeBuffers[i].setInstructionIndex(instructionToBeIssued);
+                        storeBuffers[i].issued=clockCycle;
                         instructionToBeIssued++;
                         storeBuffers[i].setRemainingTime(sdLatency);
                         break;
@@ -271,7 +300,7 @@ public class Architecture {
         //loop on mul/div
         for(int i = 0; i < 2; i++) {
             if (mulDivBuffers[i].isBusy()) {
-                if (mulDivBuffers[i].getQj().equals("") && mulDivBuffers[i].getQk().equals("")) {
+                if (mulDivBuffers[i].getQj().equals("") && mulDivBuffers[i].getQk().equals("") && mulDivBuffers[i].issued<clockCycle) {
                     //to check that all values are ready
                     if (mulDivBuffers[i].getOp().equals("MUL.D") && mulDivBuffers[i].getRemainingTime() == mulLatency) {
                         instructionQueue.get(mulDivBuffers[i].getInstructionIndex()).startExecution = clockCycle;
@@ -284,9 +313,10 @@ public class Architecture {
                         }
                     if (mulDivBuffers[i].getRemainingTime() == 0) {
                         instructionQueue.get(mulDivBuffers[i].getInstructionIndex()).finishExecution = clockCycle;
-                    } else {
-                        mulDivBuffers[i].setRemainingTime(mulDivBuffers[i].getRemainingTime() - 1);
                     }
+                    //else {
+                        mulDivBuffers[i].setRemainingTime(mulDivBuffers[i].getRemainingTime() - 1);
+                   // }
 
                 }
             }
@@ -295,7 +325,7 @@ public class Architecture {
         //loop on add/sub
         for(int i=0; i<3; i++){
             if (addSubBuffers[i].isBusy()) {
-                if (addSubBuffers[i].getQj().equals("") && addSubBuffers[i].getQk().equals("")) {
+                if (addSubBuffers[i].getQj().equals("") && addSubBuffers[i].getQk().equals("") && addSubBuffers[i].issued<clockCycle) {
                     //to check that all values are ready
                     if (addSubBuffers[i].getOp().equals("ADD.D") && addSubBuffers[i].getRemainingTime() == addLatency) {
                         instructionQueue.get(addSubBuffers[i].getInstructionIndex()).startExecution = clockCycle;
@@ -308,16 +338,17 @@ public class Architecture {
                     }
                     if (addSubBuffers[i].getRemainingTime() == 0) {
                         instructionQueue.get(addSubBuffers[i].getInstructionIndex()).finishExecution = clockCycle;
-                    } else {
-                        addSubBuffers[i].setRemainingTime(addSubBuffers[i].getRemainingTime() - 1);
                     }
+                    //else {
+                        addSubBuffers[i].setRemainingTime(addSubBuffers[i].getRemainingTime() - 1);
+                   // }
                 }
             }
         }
 
         //load
         for(int i=0 ;i<3; i++){
-            if (loadBuffers[i].isBusy()) {
+            if (loadBuffers[i].isBusy() && loadBuffers[i].issued<clockCycle) {
                     //to check that all values are ready
                     if (loadBuffers[i].getRemainingTime() == ldLatency) {
                         instructionQueue.get(loadBuffers[i].getInstructionIndex()).startExecution = clockCycle;
@@ -326,16 +357,17 @@ public class Architecture {
                     }
                     if (loadBuffers[i].getRemainingTime() == 0) {
                         instructionQueue.get(loadBuffers[i].getInstructionIndex()).finishExecution = clockCycle;
-                    } else {
-                        loadBuffers[i].setRemainingTime(loadBuffers[i].getRemainingTime() - 1);
                     }
+                    //else {
+                        loadBuffers[i].setRemainingTime(loadBuffers[i].getRemainingTime() - 1);
+                   // }
             }
 
         }
 
         //store
         for(int i=0 ;i<3; i++){
-            if (storeBuffers[i].isBusy()) {
+            if (storeBuffers[i].isBusy() && storeBuffers[i].issued<clockCycle) {
                 //to check that all values are ready
                 if ( storeBuffers[i].getQ().equals("") && storeBuffers[i].getRemainingTime() == sdLatency) {
                     instructionQueue.get(storeBuffers[i].getInstructionIndex()).startExecution = clockCycle;
@@ -344,9 +376,10 @@ public class Architecture {
                 }
                 if (storeBuffers[i].getRemainingTime() == 0) {
                     instructionQueue.get(storeBuffers[i].getInstructionIndex()).finishExecution = clockCycle;
-                } else {
-                    storeBuffers[i].setRemainingTime(storeBuffers[i].getRemainingTime() - 1);
                 }
+                //else {
+                    storeBuffers[i].setRemainingTime(storeBuffers[i].getRemainingTime() - 1);
+               // }
             }
 
         }
@@ -356,11 +389,14 @@ public class Architecture {
 
     public void writeResultHelper(){
       //String tag= bus
-        while(!bus.isEmpty()){
-            for (Map.Entry<String,Double> entry : bus.entrySet()){
+        if(!bus.isEmpty()){
+          //  for (Map.Entry<String,Double> entry : bus.entrySet()){
               //  System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
-                String key =entry.getKey();
-                Double value=entry.getValue();
+            HashMap<String,Double> result=bus.removeFirst();
+            String key = (String) result.keySet().toArray()[0];
+            Double value=result.get(key);
+
+
                 //loop over reg file, add/sub buffer, mul/div buffer, store buffer
                 //mul/div buffer
                 for(int i = 0; i < 2; i++) {
@@ -371,7 +407,7 @@ public class Architecture {
                         }
                         if(mulDivBuffers[i].getQk().equals(key)){
                             mulDivBuffers[i].setVk(value);
-                            mulDivBuffers[i].setQj("");
+                            mulDivBuffers[i].setQk("");
                         }
                     }
                 }
@@ -384,7 +420,7 @@ public class Architecture {
                         }
                         if(addSubBuffers[i].getQk().equals(key)){
                             addSubBuffers[i].setVk(value);
-                            addSubBuffers[i].setQj("");
+                            addSubBuffers[i].setQk("");
                         }
                     }
                 }
@@ -408,7 +444,7 @@ public class Architecture {
 
             }
 
-        }
+       // }
     }
     public void writeResult(){
         for(int i = 0; i < 2; i++) {
@@ -419,7 +455,9 @@ public class Architecture {
                         instructionQueue.get(mulDivBuffers[i].getInstructionIndex()).writeBack = clockCycle;
                         mulDivBuffers[i].setBusy(false);
                         //waitingToWriteBack.add(mulDivBuffers[i].getTag());
-                        bus.put(mulDivBuffers[i].getTag(),mulDivBuffers[i].getResult());
+                        HashMap<String,Double> myResultTga=new HashMap<String,Double>();
+                        myResultTga.put(mulDivBuffers[i].getTag(),mulDivBuffers[i].getResult());
+                        bus.add(myResultTga);
                     }
                 }
             }
@@ -433,7 +471,10 @@ public class Architecture {
                     if ( addSubBuffers[i].getRemainingTime() == -1) {
                         instructionQueue.get(addSubBuffers[i].getInstructionIndex()).writeBack = clockCycle;
                         addSubBuffers[i].setBusy(false);
-                        bus.put(addSubBuffers[i].getTag(),addSubBuffers[i].getResult());
+                        HashMap<String,Double> myResultTga=new HashMap<String,Double>();
+                        myResultTga.put(addSubBuffers[i].getTag(),addSubBuffers[i].getResult());
+                        bus.add(myResultTga);
+
                     }
 
                 }
@@ -448,24 +489,27 @@ public class Architecture {
                     instructionQueue.get(loadBuffers[i].getInstructionIndex()).writeBack = clockCycle;
                     //access the memory and to load value from it
                     loadBuffers[i].setBusy(false);
-                    bus.put(loadBuffers[i].getTag(),loadBuffers[i].getResult());
+                    HashMap<String,Double> myResultTga=new HashMap<String,Double>();
+                    myResultTga.put(loadBuffers[i].getTag(),loadBuffers[i].getResult());
+                    bus.add(myResultTga);
+                  //  bus.put(loadBuffers[i].getTag(),loadBuffers[i].getResult());
                 }
 
             }
         }
-        //store
-        for(int i=0 ;i<3; i++){
-            if (storeBuffers[i].isBusy()) {
-                //to check that all values are ready
-                if (storeBuffers[i].getRemainingTime() == -1 && storeBuffers[i].getQ().equals("") ) {
-                    instructionQueue.get(storeBuffers[i].getInstructionIndex()).writeBack = clockCycle;
-                    //access the memory and to load value from it
-                    storeBuffers[i].setBusy(false);
-                    bus.put(storeBuffers[i].getTag(),storeBuffers[i].getResult());
-                }
-
-            }
-        }
+        //store does put anything on bus
+//        for(int i=0 ;i<3; i++){
+//            if (storeBuffers[i].isBusy()) {
+//                //to check that all values are ready
+//                if (storeBuffers[i].getRemainingTime() == -1 && storeBuffers[i].getQ().equals("") ) {
+//                    instructionQueue.get(storeBuffers[i].getInstructionIndex()).writeBack = clockCycle;
+//                    //access the memory and to load value from it
+//                    storeBuffers[i].setBusy(false);
+//                    bus.put(storeBuffers[i].getTag(),storeBuffers[i].getResult());
+//                }
+//
+//            }
+//        }
 
 
         writeResultHelper();
@@ -475,11 +519,21 @@ public class Architecture {
         Architecture a = new Architecture();
         a.setup();
         a.parse();
+        System.out.println(a.numberOfInstructure);
         a.parseLatency();
         a.start();
-        for(Object o : a.instructionQueue) {
-            System.out.println(o.toString());
-        }
-        System.out.println(a.memory);
+//        for(Object o : a.instructionQueue) {
+//            System.out.println(o.toString());
+//        }
+//        System.out.println(a.memory);
+        LinkedList<HashMap<String,Double>> bus=new LinkedList<HashMap<String,Double>>();
+        HashMap<String,Double> insert=new HashMap<>();
+        insert.put("nouran",0.7);
+        bus.add(insert);
+        HashMap<String,Double> result=bus.removeFirst();
+        String key = (String) result.keySet().toArray()[0];
+        Double value=result.get(key);
+        System.out.println("key: "+key+"\n"+"value: "+value);
+        System.out.println(bus);
     }
 }

@@ -8,15 +8,18 @@ public class OperationBuffer {
     private int address; // to hold info for the memory address calculation for a load or a store
     private int instructionIndex;
     private double result;
+    int issued;
 
-
+public  String toString(){
+    return "Tag: "+tag+ "  "+" OPCODE: "+op+"   QJ:"+getQj()+"   QK:"+getQk()+"  VJ:"+getVj()+"  VK:"+getVk()+"   Busy:"+busy+"\n";
+}
     public OperationBuffer(String tag) { //default values
         remainingTime = -2;
         this.tag = tag;
         busy = false;
         op = "";
-        Vj = 0;
-        Vk = 0;
+        Vj = -1;
+        Vk = -1;
         Qj = "";
         Qk = "";
         address = 0;

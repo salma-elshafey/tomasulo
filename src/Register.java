@@ -8,6 +8,9 @@ public class Register {
         Qi = "";
         value = 0.0;
     }
+    public String toString(){
+        return "  QI:"+getQi()+"       Value:"+value+"\n";
+    }
     public Register (String name, String Qi, Double value){
         this.name = name;
         this.Qi = Qi;
