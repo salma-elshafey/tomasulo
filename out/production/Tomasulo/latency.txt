@@ -1,0 +1,6 @@
+L.D 1
+S.D 2
+MUL.D 4
+DIV.D 6
+ADD.D 2
+SUB.D 3
