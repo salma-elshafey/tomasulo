@@ -9,6 +9,7 @@ public class OperationBuffer {
     private int instructionIndex;
     private double result;
     int issued;
+    boolean resultWritten;
 
 public  String toString(){
     return "Tag: "+tag+ "  "+" OPCODE: "+op+"   QJ:"+getQj()+"   QK:"+getQk()+"  VJ:"+getVj()+"  VK:"+getVk()+"   Busy:"+busy+"\n";

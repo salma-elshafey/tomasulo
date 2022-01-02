@@ -6,7 +6,7 @@ public class LoadBuffer {
     private int instructionIndex;
     private double result;
     int issued;
-
+    boolean resultWritten;
     public  String toString(){
         return "Tag: "+tag+ "  "+"   Address:"+getAddress()+"   Busy:"+busy+"\n" +"remaining "+remainingTime;
     }
