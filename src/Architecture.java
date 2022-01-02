@@ -451,7 +451,7 @@ public class Architecture {
             if (mulDivBuffers[i].isBusy()) {
                 if (mulDivBuffers[i].getQj().equals("") && mulDivBuffers[i].getQk().equals("")) {
                     //to check that all values are ready
-                    if ( mulDivBuffers[i].getRemainingTime() == -1) {
+                    if ( mulDivBuffers[i].getRemainingTime() == -2) {
                         instructionQueue.get(mulDivBuffers[i].getInstructionIndex()).writeBack = clockCycle;
                         mulDivBuffers[i].setBusy(false);
                         //waitingToWriteBack.add(mulDivBuffers[i].getTag());
@@ -468,7 +468,7 @@ public class Architecture {
             if (addSubBuffers[i].isBusy()) {
                 if (addSubBuffers[i].getQj().equals("") && addSubBuffers[i].getQk().equals("")) {
                     //to check that all values are ready
-                    if ( addSubBuffers[i].getRemainingTime() == -1) {
+                    if ( addSubBuffers[i].getRemainingTime() == -2) {
                         instructionQueue.get(addSubBuffers[i].getInstructionIndex()).writeBack = clockCycle;
                         addSubBuffers[i].setBusy(false);
                         HashMap<String,Double> myResultTga=new HashMap<String,Double>();
@@ -485,7 +485,7 @@ public class Architecture {
         for(int i=0 ;i<3; i++){
             if (loadBuffers[i].isBusy()) {
                 //to check that all values are ready
-                if (loadBuffers[i].getRemainingTime() == -1) {
+                if (loadBuffers[i].getRemainingTime() == -2) {
                     instructionQueue.get(loadBuffers[i].getInstructionIndex()).writeBack = clockCycle;
                     //access the memory and to load value from it
                     loadBuffers[i].setBusy(false);

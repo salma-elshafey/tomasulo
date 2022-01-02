@@ -7,7 +7,7 @@ public class InstructionQueue {
     int issue = -1;
     int startExecution = -1;
     int finishExecution = -1;
-    int writeBack = -2;
+    int writeBack = -1;
 
     public int getIssue() {
         return issue;

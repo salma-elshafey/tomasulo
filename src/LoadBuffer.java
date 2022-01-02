@@ -8,7 +8,7 @@ public class LoadBuffer {
     int issued;
 
     public  String toString(){
-        return "Tag: "+tag+ "  "+"   Address:"+getAddress()+"   Busy:"+busy+"\n";
+        return "Tag: "+tag+ "  "+"   Address:"+getAddress()+"   Busy:"+busy+"\n" +"remaining "+remainingTime;
     }
     public LoadBuffer (String tag, boolean busy, int address){
         remainingTime = -2;
