@@ -9,11 +9,22 @@ public class OperationBuffer {
     private int instructionIndex;
     private double result;
     int issued;
-    boolean resultWritten;
-
+    int finished;
+    int lastClockBeforeRemovingRow=-1;
 public  String toString(){
     return "Tag: "+tag+ "  "+" OPCODE: "+op+"   QJ:"+getQj()+"   QK:"+getQk()+"  VJ:"+getVj()+"  VK:"+getVk()+"   Busy:"+busy+"\n";
 }
+    public void goDefault(){
+        issued=0;
+        finished=0;
+        lastClockBeforeRemovingRow=-1;
+        op = "";
+        Vj = -1;
+        Vk = -1;
+        Qj = "";
+        Qk = "";
+        address = 0;
+    }
     public OperationBuffer(String tag) { //default values
         remainingTime = -2;
         this.tag = tag;

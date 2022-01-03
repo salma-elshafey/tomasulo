@@ -6,9 +6,16 @@ public class LoadBuffer {
     private int instructionIndex;
     private double result;
     int issued;
-    boolean resultWritten;
+    int finished;
+    int lastClockBeforeRemovingRow=-1;
+
     public  String toString(){
-        return "Tag: "+tag+ "  "+"   Address:"+getAddress()+"   Busy:"+busy+"\n" +"remaining "+remainingTime;
+        return "Tag: "+tag+ "  "+"   Address:"+getAddress()+"   Busy:"+busy+"\n" ;
+    }
+    public void goDefault(){
+         issued=0;
+         finished=0;
+         lastClockBeforeRemovingRow=-1;
     }
     public LoadBuffer (String tag, boolean busy, int address){
         remainingTime = -2;

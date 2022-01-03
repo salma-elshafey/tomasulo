@@ -8,9 +8,15 @@ public class StoreBuffer {
     private int instructionIndex;
     private double result;
     int issued;
-
+    int finished;
+    int lastClockBeforeRemovingRow=-1;
     public  String toString(){
         return "Tag: "+tag+ "  "+"   Q:"+getQ()+"  V:"+getV()+"   Address:"+getAddress()+"   Busy:"+busy+"\n";
+    }
+    public void goDefault(){
+        issued=0;
+        finished=0;
+        lastClockBeforeRemovingRow=-1;
     }
     public StoreBuffer (String tag, boolean busy, int address, int V, String Q){
         remainingTime = -2;
